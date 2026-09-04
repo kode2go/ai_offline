@@ -378,7 +378,7 @@
           <h1>Your AI.<br><span>Your machine.</span></h1>
           <p class="lead">
             A lightweight Windows chatbot that runs Qwen2.5-0.5B locally on your computer.
-            No cloud API, no account and no internet connection required after setup.
+            Download one EXE, let first-run setup fetch the model, then chat without a cloud API, account or internet connection.
           </p>
           <div class="actions">
             <a class="btn primary"
@@ -437,92 +437,99 @@
       <section id="download">
         <h2 class="section-title">Download</h2>
         <p class="section-copy">
-          You need two files: the Windows application and the Qwen model.
+          Download one Windows executable. On first run, Offline AI creates its model folder and downloads the Qwen model for you.
         </p>
 
         <div class="download-grid">
           <article class="download-card">
-            <h3>1. OfflineAI.exe</h3>
-            <div class="meta">Windows application • approximately 21.5 MB</div>
-            <p>Download the application directly from the GitHub repository.</p>
+            <h3>OfflineAI.exe</h3>
+            <div class="meta">Windows application • latest GitHub release</div>
+            <p>Download the latest release. The filename stays <code>OfflineAI.exe</code>, so this link always points to the newest published version.</p>
             <p>
               <a class="btn primary"
                  href="https://github.com/kode2go/ai_offline/releases/latest/download/OfflineAI.exe">
-                ↓ Download EXE
+                ↓ Download latest OfflineAI.exe
               </a>
             </p>
           </article>
 
           <article class="download-card">
-            <h3>2. Qwen2.5-0.5B model</h3>
-            <div class="meta">GGUF • Q4_K_M • approximately 491 MB</div>
-            <p>Download the official Qwen GGUF model from Hugging Face.</p>
-            <p>
-              <a class="btn secondary"
-                 href="https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf?download=true">
-                ↓ Download Qwen model
-              </a>
-            </p>
+            <h3>Model setup is automatic</h3>
+            <div class="meta">Qwen2.5-0.5B Instruct • Q4_K_M • approximately 491 MB</div>
+            <p>On first run, Offline AI asks permission to download the model and saves it locally in the <code>models</code> folder.</p>
+            <p style="color:var(--muted);margin-bottom:0;">After that first download, normal chat can run without an internet connection.</p>
           </article>
         </div>
       </section>
 
       <section id="install">
-        <h2 class="section-title">Setup in four steps</h2>
+        <h2 class="section-title">Setup in five simple steps</h2>
         <p class="section-copy">
-          No installer is required. Keep the executable and model together using the folder layout below.
+          There is no installer and no manual model folder setup required. Offline AI handles first-run model setup for you.
         </p>
 
         <div class="steps">
           <div class="step">
             <div>
-              <h3>Create a folder</h3>
-              <p>Create a folder anywhere on your computer, for example <code>C:\OfflineAI</code>.</p>
+              <h3>Download OfflineAI.exe</h3>
+              <p>Use the download button above to get the latest GitHub release.</p>
             </div>
           </div>
 
           <div class="step">
             <div>
-              <h3>Place the EXE inside it</h3>
-              <p>Move <code>OfflineAI.exe</code> into your new <code>OfflineAI</code> folder.</p>
+              <h3>Run the application</h3>
+              <p>Double-click <code>OfflineAI.exe</code>. A startup splash appears while the application prepares to open.</p>
             </div>
           </div>
 
           <div class="step">
             <div>
-              <h3>Create the model folder</h3>
-              <p>Inside <code>OfflineAI</code>, create a folder named exactly <code>models</code>.</p>
+              <h3>Approve the model download</h3>
+              <p>On first run, click <strong>Yes</strong> when Offline AI asks to download the Qwen2.5-0.5B model. This requires an internet connection and downloads about 491 MB.</p>
             </div>
           </div>
 
           <div class="step">
             <div>
-              <h3>Add the Qwen model and run</h3>
-              <p>
-                Put <code>qwen2.5-0.5b-instruct-q4_k_m.gguf</code> inside the
-                <code>models</code> folder, then double-click <code>OfflineAI.exe</code>.
-              </p>
+              <h3>Wait for first-time setup</h3>
+              <p>The app creates the <code>models</code> folder, downloads the model, and then loads it. Startup itself may take up to around two minutes on some PCs; model download time depends on your internet connection.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div>
+              <h3>Start chatting offline</h3>
+              <p>Once the model has been downloaded, future chats run locally on your PC and do not require a cloud AI service or account.</p>
             </div>
           </div>
         </div>
 
-        <h3 style="margin-top:32px;">Final folder layout</h3>
+        <h3 style="margin-top:32px;">Folder layout after first setup</h3>
 <pre>OfflineAI\
 ├── OfflineAI.exe
 └── models\
     └── qwen2.5-0.5b-instruct-q4_k_m.gguf</pre>
 
         <div class="note">
-          Once both files are downloaded, you can disconnect from the internet and run the chatbot locally.
-          The GGUF file is the AI model; keep its filename unchanged.
+          <strong>First run needs internet access.</strong> Offline AI only needs the connection to download the model. Once the model exists locally, normal chatbot inference runs on your computer.
         </div>
+
+        <h3 style="margin-top:32px;">Manual model setup</h3>
+        <p class="section-copy">
+          Automatic setup is recommended. If you prefer to install the model manually, create a <code>models</code> folder beside <code>OfflineAI.exe</code> and place the GGUF file inside it using the exact filename shown above.
+        </p>
+        <a class="btn secondary"
+           href="https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf?download=true">
+          ↓ Manual Qwen model download
+        </a>
       </section>
     </div>
   </main>
 
   <footer>
     <div class="wrap row">
-      <span>Offline AI • Local desktop AI experiment</span>
+      <span>Offline AI • Private local Windows AI</span>
       <span>
         <a href="https://github.com/kode2go/ai_offline" target="_blank" rel="noopener">GitHub repository</a>
         &nbsp;•&nbsp;
