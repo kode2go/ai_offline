@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Offline AI — a lightweight local Windows chatbot powered by Qwen2.5-0.5B and llama.cpp.">
+  <title>Offline AI</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #11182b;
+      --panel-2: #151e35;
+      --text: #f4f7fb;
+      --muted: #9eabc4;
+      --accent: #66d9a8;
+      --accent-2: #8cb8ff;
+      --border: rgba(255,255,255,.10);
+      --shadow: 0 18px 45px rgba(0,0,0,.28);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+                   "Segoe UI", Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(102,217,168,.13), transparent 30%),
+        radial-gradient(circle at 90% 5%, rgba(140,184,255,.12), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(1100px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(16px);
+      background: rgba(11,16,32,.78);
+      z-index: 10;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+
+    .logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #071019;
+      font-size: 21px;
+      box-shadow: 0 8px 25px rgba(102,217,168,.18);
+    }
+
+    nav .links {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    nav .links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    nav .links a:hover { color: var(--text); }
+
+    .hero {
+      padding: 92px 0 64px;
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(102,217,168,.28);
+      background: rgba(102,217,168,.08);
+      color: #aaf0cf;
+      font-size: .88rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 7vw, 5.9rem);
+      line-height: .98;
+      letter-spacing: -.065em;
+      margin: 22px 0;
+    }
+
+    h1 span {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      max-width: 720px;
+      font-size: 1.15rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 800;
+      border: 1px solid var(--border);
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn.primary {
+      background: var(--accent);
+      color: #071019;
+      border-color: transparent;
+    }
+
+    .btn.secondary {
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+    }
+
+    .terminal {
+      background: #070b14;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .terminal-bar {
+      display: flex;
+      gap: 7px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #435069; }
+
+    .terminal-body {
+      padding: 24px;
+      font-family: "Cascadia Code", Consolas, monospace;
+      color: #d7e2f5;
+      font-size: .9rem;
+    }
+
+    .terminal-body .green { color: var(--accent); }
+    .terminal-body .blue { color: var(--accent-2); }
+    .terminal-body .muted { color: #70809c; }
+
+    section { padding: 38px 0 72px; }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      letter-spacing: -.04em;
+      margin: 0 0 10px;
+    }
+
+    .section-copy {
+      color: var(--muted);
+      max-width: 760px;
+      margin: 0 0 30px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.025));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+
+    .card h3 { margin: 8px 0 8px; font-size: 1.2rem; }
+    .card p { margin: 0; color: var(--muted); }
+
+    .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(140,184,255,.10);
+      border: 1px solid rgba(140,184,255,.16);
+      font-size: 1.35rem;
+    }
+
+    .download-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .download-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .download-card .meta {
+      color: var(--muted);
+      font-size: .92rem;
+      margin-bottom: 18px;
+    }
+
+    .download-card h3 {
+      margin: 0 0 6px;
+      font-size: 1.45rem;
+    }
+
+    .steps {
+      counter-reset: step;
+      display: grid;
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .step {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 15px;
+      align-items: start;
+      padding: 22px;
+      background: rgba(255,255,255,.035);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .step::before {
+      content: counter(step);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--accent);
+      color: #071019;
+      font-weight: 900;
+    }
+
+    .step h3 { margin: 1px 0 5px; }
+    .step p { margin: 0; color: var(--muted); }
+
+    code, pre {
+      font-family: "Cascadia Code", Consolas, monospace;
+    }
+
+    code {
+      background: rgba(255,255,255,.07);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 2px 6px;
+      word-break: break-word;
+    }
+
+    pre {
+      background: #070b14;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      overflow-x: auto;
+      color: #d8e5f8;
+    }
+
+    .note {
+      margin-top: 22px;
+      border-left: 3px solid var(--accent);
+      background: rgba(102,217,168,.07);
+      padding: 16px 18px;
+      border-radius: 0 12px 12px 0;
+      color: #cfeadd;
+    }
+
+    footer {
+      padding: 34px 0 48px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-size: .92rem;
+    }
+
+    footer .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    footer a { color: var(--text); text-decoration: none; }
+
+    @media (max-width: 820px) {
+      .hero { grid-template-columns: 1fr; padding-top: 64px; }
+      .cards, .download-grid { grid-template-columns: 1fr; }
+      nav .links a:not(.repo-link) { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <nav>
+        <div class="brand">
+          <div class="logo">AI</div>
+          <span>Offline AI</span>
+        </div>
+        <div class="links">
+          <a href="#features">Features</a>
+          <a href="#download">Download</a>
+          <a href="#install">Setup</a>
+          <a class="repo-link" href="https://github.com/kode2go/ai_offline" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">● 100% local inference</div>
+          <h1>Your AI.<br><span>Your machine.</span></h1>
+          <p class="lead">
+            A lightweight Windows chatbot that runs Qwen2.5-0.5B locally on your computer.
+            No cloud API, no account and no internet connection required after setup.
+          </p>
+          <div class="actions">
+            <a class="btn primary"
+               href="https://github.com/kode2go/ai_offline/raw/refs/heads/main/app/OfflineAI.exe">
+              ↓ Download OfflineAI.exe
+            </a>
+            <a class="btn secondary"
+               href="https://github.com/kode2go/ai_offline"
+               target="_blank" rel="noopener">
+              View source on GitHub
+            </a>
+          </div>
+        </div>
+
+        <div class="terminal" aria-label="Offline AI example">
+          <div class="terminal-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+          </div>
+          <div class="terminal-body">
+            <div class="muted">Offline AI</div>
+            <br>
+            <div><span class="blue">You:</span> What is Python?</div>
+            <br>
+            <div><span class="green">AI:</span> Python is a high-level, general-purpose programming language known for its readable syntax.</div>
+            <br>
+            <div class="muted">Qwen2.5 0.5B • Local • Offline</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="features">
+        <h2 class="section-title">Small, local and private.</h2>
+        <p class="section-copy">
+          Offline AI uses a compact GGUF language model and local CPU inference. The model file stays on your machine.
+        </p>
+
+        <div class="cards">
+          <article class="card">
+            <div class="icon">🔒</div>
+            <h3>Offline by design</h3>
+            <p>After downloading the application and model, normal chatbot inference does not require an internet connection.</p>
+          </article>
+          <article class="card">
+            <div class="icon">⚡</div>
+            <h3>Lightweight model</h3>
+            <p>Qwen2.5-0.5B Q4_K_M is about 491 MB and is designed to be practical on ordinary desktop hardware.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🖥️</div>
+            <h3>Simple desktop app</h3>
+            <p>A compact Windows interface powered by Python, CustomTkinter and llama.cpp-compatible local inference.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="download">
+        <h2 class="section-title">Download</h2>
+        <p class="section-copy">
+          You need two files: the Windows application and the Qwen model.
+        </p>
+
+        <div class="download-grid">
+          <article class="download-card">
+            <h3>1. OfflineAI.exe</h3>
+            <div class="meta">Windows application • approximately 21.5 MB</div>
+            <p>Download the application directly from the GitHub repository.</p>
+            <p>
+              <a class="btn primary"
+                 href="https://github.com/kode2go/ai_offline/raw/refs/heads/main/app/OfflineAI.exe">
+                ↓ Download EXE
+              </a>
+            </p>
+          </article>
+
+          <article class="download-card">
+            <h3>2. Qwen2.5-0.5B model</h3>
+            <div class="meta">GGUF • Q4_K_M • approximately 491 MB</div>
+            <p>Download the official Qwen GGUF model from Hugging Face.</p>
+            <p>
+              <a class="btn secondary"
+                 href="https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/main/qwen2.5-0.5b-instruct-q4_k_m.gguf?download=true">
+                ↓ Download Qwen model
+              </a>
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="install">
+        <h2 class="section-title">Setup in four steps</h2>
+        <p class="section-copy">
+          No installer is required. Keep the executable and model together using the folder layout below.
+        </p>
+
+        <div class="steps">
+          <div class="step">
+            <div>
+              <h3>Create a folder</h3>
+              <p>Create a folder anywhere on your computer, for example <code>C:\OfflineAI</code>.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div>
+              <h3>Place the EXE inside it</h3>
+              <p>Move <code>OfflineAI.exe</code> into your new <code>OfflineAI</code> folder.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div>
+              <h3>Create the model folder</h3>
+              <p>Inside <code>OfflineAI</code>, create a folder named exactly <code>models</code>.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div>
+              <h3>Add the Qwen model and run</h3>
+              <p>
+                Put <code>qwen2.5-0.5b-instruct-q4_k_m.gguf</code> inside the
+                <code>models</code> folder, then double-click <code>OfflineAI.exe</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:32px;">Final folder layout</h3>
+<pre>OfflineAI\
+├── OfflineAI.exe
+└── models\
+    └── qwen2.5-0.5b-instruct-q4_k_m.gguf</pre>
+
+        <div class="note">
+          Once both files are downloaded, you can disconnect from the internet and run the chatbot locally.
+          The GGUF file is the AI model; keep its filename unchanged.
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap row">
+      <span>Offline AI • Local desktop AI experiment</span>
+      <span>
+        <a href="https://github.com/kode2go/ai_offline" target="_blank" rel="noopener">GitHub repository</a>
+        &nbsp;•&nbsp;
+        <a href="https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF" target="_blank" rel="noopener">Qwen model</a>
+      </span>
+    </div>
+  </footer>
+</body>
+</html>
